@@ -36,7 +36,7 @@ namespace Relecloud.Web.Api
 
             AddAzureSearchService(services);
             AddConcertContextServices(services);
-            AddDistributedSession(services);
+            AddRedisCache(services);
             AddPaymentGatewayService(services);
             AddTicketManagementService(services);
             AddTicketImageService(services);
@@ -105,34 +105,16 @@ namespace Relecloud.Web.Api
             else
             {
                 // Add a concert repository based on Azure SQL Database.
-                services.AddDbContextPool<ConcertDataContext>(options => options.UseSqlServer(sqlDatabaseConnectionString,
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(3),
-                        errorNumbersToAdd: null);
-                    }));
+                services.AddDbContextPool<ConcertDataContext>(options => options.UseSqlServer(sqlDatabaseConnectionString));
+
+
                 services.AddScoped<IConcertRepository, SqlDatabaseConcertRepository>();
             }
         }
 
-        private void AddDistributedSession(IServiceCollection services)
+        private void AddRedisCache(IServiceCollection services)
         {
-            var redisCacheConnectionString = Configuration["App:RedisCache:ConnectionString"];
-            if (!string.IsNullOrWhiteSpace(redisCacheConnectionString))
-            {
-                // If we have a connection string to Redis, use that as the distributed cache.
-                // If not, ASP.NET Core automatically injects an in-memory cache.
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = redisCacheConnectionString;
-                });
-            }
-            else
-            {
-                services.AddDistributedMemoryCache();
-            }
+            services.AddDistributedMemoryCache();
         }
 
         private void AddPaymentGatewayService(IServiceCollection services)

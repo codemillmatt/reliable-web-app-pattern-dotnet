@@ -82,9 +82,7 @@ namespace Relecloud.Web
                     httpClient.BaseAddress = new Uri(baseUri);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                });
             }
         }
 
@@ -102,9 +100,7 @@ namespace Relecloud.Web
                     httpClient.BaseAddress = new Uri(baseUri);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                });
             }
         }
 
@@ -122,27 +118,8 @@ namespace Relecloud.Web
                     httpClient.BaseAddress = new Uri(baseUri);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/octet-stream");
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                });
             }
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), retryCount: 3);
-
-            return HttpPolicyExtensions
-              .HandleTransientHttpError()
-              .WaitAndRetryAsync(delay);
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
         }
 
         private void AddConcertContextService(IServiceCollection services)
@@ -159,9 +136,7 @@ namespace Relecloud.Web
                     httpClient.BaseAddress = new Uri(baseUri);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                });
             }
         }
 
